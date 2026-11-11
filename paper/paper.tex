@@ -5,8 +5,9 @@
 \usepackage{booktabs}
 \usepackage{float}
 \usepackage{tikz}
-\usetikzlibrary{arrows.meta,positioning}
 \usepackage[colorlinks=true,linkcolor=blue!60!black,citecolor=blue!60!black,urlcolor=blue!60!black]{hyperref}
+
+\usetikzlibrary{arrows.meta,positioning}
 
 \floatstyle{ruled}
 \newfloat{algorithm}{tbp}{loa}
@@ -19,12 +20,11 @@
 \newcommand{\dman}{d_{\mathrm{Man}}}
 \newcommand{\eps}{\varepsilon}
 
-\title{\bfseries Routing an Ambulance through a Grid-Structured City:\\ Integer Programming, Sensitivity Analysis, and A* Search\\[2mm]
+\title{\bfseries Routing an Ambulance through a Grid-Structured City:\\ Integer Programming, Sensitivity Analysis, $A^{\star}$ Search\\[2mm]
 \large A Two-Leg Shortest Path Project on Manhattan-Plan Road Networks}
 
-\author{Lampros Prinzios\\
-% TODO: replace with your department, university, and e-mail
-{\small Department of \ldots, University of \ldots, \texttt{...@...}}\\
+\author{Lampros Printzios\\
+{\small ECE Department, University of Patras, Greece, \texttt{printzios\_lampros@ac.upatras.gr}}\\
 {\small Final project for the course ``Linear and Combinatorial Optimization''}}
 \date{}
 
@@ -48,16 +48,15 @@ independent IPs that share the same constraint matrix and cost vector and differ
 right-hand side. Both minimization criteria of the underlying tool are covered---route
 length and travel time---the latter induced by additive, integer per-segment time penalties
 (traffic, road works, gravel roads, traffic lights). As an algorithmic alternative we
-implement A* search with a Manhattan-distance heuristic and prove its admissibility and
+implement $A^{\star}$ search with a Manhattan-distance heuristic and prove its admissibility and
 consistency for both criteria. Finally, we develop an integer sensitivity analysis that
 determines, for every edge, the maximal cost perturbation that the current shortest path
 tolerates before rerouting; a binary search over a monotone objective-value predicate locates
 this threshold with $\lceil \log_2 N \rceil$ IP re-solves instead of the $N$ re-solves of a
 linear scan, and a sufficient condition for uniqueness of the optimal path is derived. The
-optima obtained by the IP solver, by Dijkstra's algorithm, and by A* agree on all five
+optima obtained by the IP solver, by Dijkstra's algorithm, and by $A^{\star}$ agree on all five
 benchmark instances, with grids of up to $100\times 100$ cells. All components are
-integrated in an interactive graphical tool for constructing, solving, and analyzing such
-networks.
+integrated in an interactive graphical tool for constructing, solving, 
 \end{abstract}
 
 \section{Introduction}
@@ -92,7 +91,7 @@ and assess in this paper, are the following.
         total unimodularity (Proposition~\ref{prop:tu}), and a decomposition of the two-leg
         problem into two IPs that differ only in their right-hand sides
         (Proposition~\ref{prop:twoleg}, Remark~\ref{rem:shared}).
-  \item \textbf{An A* implementation} for single-pair queries
+  \item \textbf{An $A^{\star}$ implementation} for single-pair queries
         (Section~\ref{sec:astar}), with a Manhattan-distance heuristic whose admissibility
         and consistency we prove for both criteria (Proposition~\ref{prop:heuristic}).
   \item \textbf{An integer sensitivity analysis} (Section~\ref{sec:sens}) that computes, for
@@ -104,7 +103,7 @@ and assess in this paper, are the following.
         (Remark~\ref{rem:unique}).
   \item \textbf{An experimental evaluation} (Section~\ref{sec:exp}) on five instances with
         grids of up to $100\times100$ cells, cross-validating the optima returned by three
-        independent solvers (GLPK through \textsf{pymprog}, Dijkstra's algorithm, and A*),
+        independent solvers (GLPK through \textsf{pymprog}, Dijkstra's algorithm, and $A^{\star}$),
         and a full sensitivity study on a worked example, including the comparison of the
         linear and binary search variants ($9$ versus $4$ re-solves).
 \end{itemize}
@@ -125,11 +124,11 @@ thoroughly studied problems of network optimization; Schrijver~\cite{schrijver12
 their history back to the nineteenth century. Bellman~\cite{bellman58} characterized the
 problem through dynamic programming, Ford~\cite{ford56} described the label-correcting
 method, and Dijkstra~\cite{dijkstra59} gave the classical greedy label-setting algorithm.
-Dreyfus~\cite{dreyfus69} surveyed the early algorithm families. Our A* implementation
+Dreyfus~\cite{dreyfus69} surveyed the early algorithm families. Our $A^{\star}$ implementation
 follows Hart, Nilsson, and Raphael~\cite{hnr68}, whose admissible heuristics guarantee
 optimality; Dechter and Pearl~\cite{dechterpearl85} analyzed the optimality and efficiency
-of A* and its variants in depth. On road networks specifically, Goldberg and
-Harrelson~\cite{goldbergharrelson05} popularized the combination of A* with landmark-based
+of $A^{\star}$ and its variants in depth. On road networks specifically, Goldberg and
+Harrelson~\cite{goldbergharrelson05} popularized the combination of $A^{\star}$ with landmark-based
 lower bounds; our heuristic is the structurally analogous, metric lower bound supplied by
 the grid geometry itself (the Manhattan metric~\cite{krause86}).
 
@@ -350,19 +349,19 @@ IPs are generated from the same data structures and solved in succession.
   \node[vtx]              (3) at (2.4,0)   {$3$};
   \node[vtx]              (4) at (2.4,2.4) {$4$};
   \node[vtx,fill=green!20](5) at (5,2.4)  {$5$};
-  \node[font=\scriptsize,anchor=north] at (0,1.85) {ambulance};
+  \node[font=\scriptsize,anchor=north] at (-0.2,1.85) {ambulance};
   \node[font=\scriptsize,anchor=south] at (2.4,5.35) {hospital};
   \node[font=\scriptsize,anchor=north] at (5,1.85) {patient};
  
   \draw[->,very thick,red!70!black] (1) -- node[font=\scriptsize,above left,pos=0.55] {$4$} (2);
-  \draw[->] (1) -- node[font=\scriptsize,below left,pos=0.6] {$5$} (3);
+  \draw[->] (1) -- node[font=\scriptsize,below,pos=0.4] {$5$} (3);
   \draw[->,very thick,red!70!black] (1) -- node[font=\scriptsize,above,pos=0.5] {$2$} (4);
-  \draw[->,very thick,red!70!black] (2) -- node[font=\scriptsize,above,pos=0.45] {$6$} (5);
-  \draw[->] (3) -- node[font=\scriptsize,below right,pos=0.6] {$5$} (1);
+  \draw[->,very thick,red!70!black] (2) -- node[font=\scriptsize,below,pos=0.45] {$6$} (5);
+  \draw[->] (3) -- node[font=\scriptsize,above,pos=0.4] {$5$} (1);
   \draw[->] (3) -- node[font=\scriptsize,right,pos=0.5] {$2$} (4);
   \draw[->] (3) -- node[font=\scriptsize,below right,pos=0.6] {$7$} (5);
   \draw[->,very thick,red!70!black] (4) -- node[font=\scriptsize,right,pos=0.5] {$2$} (2);
-  \draw[->] (5) -- node[font=\scriptsize,above,pos=0.55] {$6$} (2);
+  \draw[->] (5) -- node[font=\scriptsize,above,pos=0.45] {$6$} (2);
   \draw[->] (5) -- node[font=\scriptsize,below,pos=0.5] {$3$} (4);
 \end{tikzpicture}
 \caption{The $5$-vertex, $10$-arc toy network of the tool (Section~\ref{sec:toy}), with arc
@@ -385,13 +384,13 @@ $x_{14}=x_{42}=x_{25}=1$) and $Z_{P\to H}=5$ (attained by $x_{54}=x_{42}=1$). At
 default parameters ($1$\,m cells, $10$\,km/h) these are $3.6$\,s and $1.8$\,s of absolute
 travel time.
 
-\section{A* search with a Manhattan heuristic}
+\section{$A^{\star}$ search with a Manhattan heuristic}
 \label{sec:astar}
 
-For interactive single-pair queries the tool also implements A* search~\cite{hnr68}: nodes
+For interactive single-pair queries the tool also implements $A^{\star}$ search~\cite{hnr68}: nodes
 are expanded in increasing order of $f(n)=g(n)+h(n)$, where $g(n)$ is the cost incurred from
 the source to $n$ and $h(n)$ estimates the remaining cost to the target. Dijkstra's
-algorithm~\cite{dijkstra59} is the special case $h\equiv 0$; A* is preferable here because
+algorithm~\cite{dijkstra59} is the special case $h\equiv 0$; $A^{\star}$ is preferable here because
 exactly one target matters, whereas Dijkstra necessarily computes distances to all
 vertices. Both algorithms are complete on finite graphs with nonnegative costs.
 
@@ -417,7 +416,7 @@ from the same triangle inequality,
 $\dman(u,t)\le\dman(u,v)+\dman(v,t)\le w(u,v)+h(v)$.
 \end{proof}
 
-Consequently, A* with this heuristic is optimal (it returns minimum-cost paths) on our
+Consequently, $A^{\star}$ with this heuristic is optimal (it returns minimum-cost paths) on our
 networks under both criteria~\cite{hnr68,dechterpearl85}. The implementation maintains open
 lists, parent pointers, and $g$-scores in dictionaries over grid coordinates and resolves
 each road's cost by a lookup keyed by the vertex pair; on all instances of
@@ -496,23 +495,24 @@ integers $\ge 1$.
 \begin{figure}[t]
 \centering
 \begin{tikzpicture}[scale=0.6,>={Stealth[length=2.2mm]}]
-  \draw[->] (-0.25,0) -- (4.6,0);
+  \draw[->] (-0.25,0) -- (4.6,0) node[font=\scriptsize,below] {$\delta$};
   \draw[->] (0,-0.25) -- (0,3.9);
   \draw[very thick] (0,0.8) -- (2.2,3.0) -- (4.4,3.0);
   \draw[dashed] (2.2,0) -- (2.2,3.0);
-  \node[font=\scriptsize,below] at (2.2,-0.05) {$\Delta c^{\max}_e$};
+  \node[font=\scriptsize,above] at (3.0,-0.05) {$\Delta c^{\max}_e$};
   \draw[dashed] (0,3.0) -- (4.4,3.0);
   \node[font=\scriptsize,left] at (0,0.75) {$Z$};
-  \node[font=\scriptsize,above] at (4.3,3.05) {$M_e$};
+  \node[font=\scriptsize,above] at (4.3,3.0) {$M_e$};
   \node[font=\scriptsize] at (2.2,-0.8) {(a)};
   \draw[->] (6.25,0) -- (10.9,0) node[font=\scriptsize,below] {$\delta$};
   \draw[->] (6.5,-0.25) -- (6.5,3.9);
   \draw[very thick] (6.5,3.2) -- (8.2,3.2) -- (10.6,0.8);
   \draw[dashed] (8.2,0) -- (8.2,3.2);
-  \node[font=\scriptsize,below] at (8.2,-0.05) {$\Delta c^{\max\!-}_e$};
+  \node[font=\scriptsize,above] at (9.1,-0.05) {$\Delta c^{\max\!-}_e$};
   \draw[dashed] (6.5,3.2) -- (10.6,3.2);
   \node[font=\scriptsize,left] at (6.5,3.15) {$Z$};
-  \node[font=\scriptsize,below right] at (10.35,0.75) {$M'_e\!-\!\delta$};
+  \node[font=\scriptsize,above] at (10.6,3.15) {$M'_e$};
+  \node[font=\scriptsize,below right] at (10.35,1.0) {$M'_e\!-\!\delta$};
   \node[font=\scriptsize] at (8.7,-0.8) {(b)};
 \end{tikzpicture}
 \caption{The value function of the perturbed problem. (a) Increasing the cost of an edge
@@ -577,7 +577,7 @@ uniqueness test.
 
 All experiments were run with the project's tool: a Tkinter-based graphical application in
 which the user draws the network, selects the criterion, checks connectivity, solves the
-two legs (IP or A*), and applies the sensitivity analysis per edge; instances are stored as
+two legs (IP or $A^{\star}$), and applies the sensitivity analysis per edge; instances are stored as
 plain-text files listing vertices, edge cells, penalty categories with their multipliers,
 and directionalities. Table~\ref{tab:instances} summarizes the five benchmark instances:
 grid sizes from $10\times10$ to $100\times100$ cells, $5$ to $28$ vertices, $8$ to $32$
@@ -587,7 +587,7 @@ roads (10 to 64 arcs after splitting two-way roads), and both criteria.
 \centering
 \caption{The five benchmark instances. $|E|$ counts roads, $|\mathcal{A}|$ the arcs after
 splitting two-way roads; $Z$ are the relative optimal costs of the two legs as computed by
-the IP (GLPK), cross-validated with Dijkstra's algorithm and with A* (agreement on all
+the IP (GLPK), cross-validated with Dijkstra's algorithm and with $A^{\star}$ (agreement on all
 values and paths). The optima of E3 and E5 were produced with the same model data by an
 independent shortest-path implementation, which coincides with the IP optimum by
 Proposition~\ref{prop:tu}.}
@@ -613,7 +613,7 @@ patient$\,\to\,$hospital connection of length $30$ is infeasible because one of 
 one-way in the opposite direction, and the optimal feasible path costs $52$---an
 illustration of why directionality must be modeled explicitly. On E4, the largest
 time-criterion instance, GLPK certifies optima $205$ and $258$ for the two legs, matching
-the A* and Dijkstra solutions.
+the $A^{\star}$ and Dijkstra solutions.
 
 \subsection{The sensitivity experiment}
 \label{sec:sensexperiment}
@@ -631,13 +631,13 @@ the A* and Dijkstra solutions.
   \node[font=\scriptsize,anchor=south] at (2.4,5.35) {$H$};
   \node[font=\scriptsize,anchor=north] at (5,1.85) {$P$};
  
-  \draw[->,very thick] (1) -- node[font=\scriptsize,above left,pos=0.55] {$e_1/4$} (2);
+  \draw[->,very thick] (1) -- node[font=\scriptsize,above left,pos=0.45] {$e_1/4$} (2);
   \draw[<->] (1) -- node[font=\scriptsize,below left,pos=0.6] {$e_2/5$} (3);
   \draw[->] (1) -- node[font=\scriptsize,above,pos=0.5] {$e_3/2$} (4);
-  \draw[->,very thick,dashed] (4) -- node[font=\scriptsize,right,pos=0.55] {$e_4/2$} (2);
+  \draw[->,very thick,dashed] (4) -- node[font=\scriptsize,right,pos=0.45] {$e_4/2$} (2);
   \draw[->] (3) -- node[font=\scriptsize,right,pos=0.5] {$e_5/2$} (4);
-  \draw[->] (3) -- node[font=\scriptsize,below right,pos=0.6] {$e_6/7$} (5);
-  \draw[<->,very thick] (2) -- node[font=\scriptsize,above,pos=0.45] {$e_7/6$} (5);
+  \draw[->] (3) -- node[font=\scriptsize,below right,pos=0.4] {$e_6/7$} (5);
+  \draw[<->,very thick] (2) -- node[font=\scriptsize,above right,pos=0.5] {$e_7/6$} (5);
   \draw[->,very thick,dashed] (5) -- node[font=\scriptsize,below,pos=0.5] {$e_8/3$} (4);
 \end{tikzpicture}
 \caption{The sensitivity experiment network (same vertex layout as
@@ -719,7 +719,7 @@ which matters when the analysis is run over all edges of large networks.
 \paragraph{What is classical and what is not.}
 The ingredients of this project are individually classical: the minimum-cost-flow-type
 formulation goes back to Dantzig and Ford--Fulkerson~\cite{dantzig60,fordfulkerson62}, the
-total-unimodularity argument is textbook material~\cite{ahuja93,schrijver03}, A* with a
+total-unimodularity argument is textbook material~\cite{ahuja93,schrijver03}, $A^{\star}$ with a
 consistent heuristic is textbook material~\cite{hnr68,dechterpearl85}, and sensitivity
 analysis of linear programs is classical~\cite{gass85}. The value of the project lies in
 the combination: a single coherent framework in which a drawing becomes a formal IP, both
@@ -735,7 +735,7 @@ the full value function for one varying edge in polynomial time~\cite{karporlin8
 youngtarjanorlin91}, with the caveat that the number of breakpoints can be
 large~\cite{carstensen83}. The re-solve-based method implemented here trades this
 theoretical elegance for two practical advantages: it works with any black-box solver (or
-even with the A* engine) that returns only optimal values, and it extends unchanged to
+even with the $A^{\star}$ engine) that returns only optimal values, and it extends unchanged to
 integer perturbations of the combinatorial add-on structure, where ranging information is
 unavailable. A systematic empirical comparison with LP ranging is an obvious next step.
 
@@ -755,7 +755,7 @@ educational exploration of the optimization models involved.
 
 We presented a complete modeling-to-analysis pipeline for a two-leg ambulance routing
 scenario on grid-structured city networks: an integer programming formulation with proved
-redundancy, integrality, and decomposition properties; an optimally-admissible A* search
+redundancy, integrality, and decomposition properties; an optimally-admissible $A^{\star}$ search
 component; and an integer sensitivity analysis whose thresholds are located with
 $\lceil\log_2 N\rceil$ re-solves and double as uniqueness certificates. Three independent
 solvers agreed on all benchmark instances, and the worked example confirmed every closed
